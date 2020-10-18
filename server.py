@@ -15,13 +15,22 @@ while True:
     data = json.loads(conn.recv(255))
 
     if "add" in data:
-        id = cursor.execute("SELECT MAX(ID) FROM PASSWORDS;").fetchone()[0]
-        cursor.execute("""
-            INSERT INTO PASSWORDS (ID, USERNAME, SITE, PASSWORD) VALUES (?,?,?,?);
-        """, [(id := id + 1), data["username"], data["site"], data["key"]])
+        try:
+            id = cursor.execute("SELECT MAX(ID) FROM PASSWORDS;").fetchone()[0]
+            cursor.execute("""
+                INSERT INTO PASSWORDS (ID, USERNAME, SITE, PASSWORD) VALUES (?,?,?,?);
+            """, [(id := int(id) + 1), data["username"], data["site"], data["key"]])
 
-        database.commit()
-        conn.send("Success!".encode())
+            database.commit()
+            conn.send("Success!".encode())
+        except:
+            id = cursor.execute("SELECT MAX(ID) FROM PASSWORDS;").fetchone()[0]
+            cursor.execute("""
+                INSERT INTO PASSWORDS (ID, USERNAME, SITE, PASSWORD) VALUES (?,?,?,?);
+            """, [0, data["username"], data["site"], data["key"]])
+
+            database.commit()
+            conn.send("Success!".encode())
 
     else:
         if data["decrypt_password"] and not data["choose_password"]:

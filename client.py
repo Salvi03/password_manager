@@ -63,7 +63,6 @@ else:
     username = str(input("Inserisci il tuo username: "))
 
     password = Fernet(key.encode()).encrypt(password.encode()).decode()
-    print("First debugging")
 
     client.send(json.dumps({
         "add": True,
@@ -72,4 +71,4 @@ else:
         "username": username
     }).encode())
 
-    print(client.recv(255))
+    print(client.recv(255).decode())
